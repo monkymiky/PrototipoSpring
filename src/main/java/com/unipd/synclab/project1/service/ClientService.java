@@ -3,13 +3,13 @@ package com.unipd.synclab.project1.service;
 import com.unipd.synclab.project1.dto.AddressDTO;
 import com.unipd.synclab.project1.dto.ClientRequestDTO;
 import com.unipd.synclab.project1.dto.ClientResponseDTO;
+import com.unipd.synclab.project1.exception.ReferencedResourceNotFoundException;
 import com.unipd.synclab.project1.utility.ClientMapper;
 import com.unipd.synclab.project1.model.Address;
 import com.unipd.synclab.project1.model.Client;
 import com.unipd.synclab.project1.repository.AddressRepository; 
 import com.unipd.synclab.project1.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,23 +57,19 @@ public class ClientService {
         // Se non ha ID (o ID=0), ne creiamo uno nuovo.
         Address addressToSave = client.getAddress();
         if (addressToSave != null) {
-            boolean isNewAddress = addressToSave.getId() == null || addressToSave.getId() == 0;
-            if (!isNewAddress) {
+            Integer addressId = addressToSave.getId();
+            boolean addressExsist = (addressId != null && addressId != 0);
+            if (addressExsist) {
                 // Prova a caricare l'indirizzo esistente
-                Address existingAddress = addressRepository.findById(addressToSave.getId())
-                    .orElse(null); // O lancia eccezione se DEVE esistere
-                if (existingAddress != null) {
-                    // ID trovato, viene utilizzato l'indirizzo esistente
-                    addressToSave = existingAddress;
-                } else {
-                     // L'ID era fornito ma non trovato, viene creato un indirizzo nuovo
-                     addressToSave.setId(null); // Assicura che sia creato come nuovo
-                }
+                Address existingAddress = addressRepository.findById(addressId)
+                    .orElseThrow(() -> new ReferencedResourceNotFoundException("Attempted to reference a non-existent Address with id: " + addressId)); // O lancia eccezione perche DEVE esistere
+                // ID trovato, viene utilizzato l'indirizzo esistente
+                addressToSave = existingAddress;
             } else {
                 addressToSave.setId(null);
             }
         }
-        client.setAddress(addressToSave); // Riassegna per assicurare che il client abbia l'istanza corretta (managed o nuova)
+        client.setAddress(addressToSave); // Riassegna per assicurare che il client abbia l'istanza corretta (modificata o nuova)
 
         Client savedClient = clientRepository.save(client);
         return clientMapper.toClientResponseDTO(savedClient);

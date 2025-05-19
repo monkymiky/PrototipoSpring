@@ -5,11 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ import com.unipd.synclab.project1.service.ClientService;
 
 
 @RestController
-@RequestMapping("/client") 
+@RequestMapping("/clients") 
 public class ClientController {
     
     private final ClientService clientService;
@@ -32,19 +33,18 @@ public class ClientController {
     @GetMapping("/{clientId}")
     public ClientResponseDTO getClient(@PathVariable("clientId") Integer clientId) throws Exception {
         ClientResponseDTO  clientDTO =  clientService.getClientbyId(clientId);
-        if(clientDTO != null) 
-            return clientDTO;
-        throw new Exception("Utente non trovato nella lista con id = " + clientId);
+        return clientDTO;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<ClientResponseDTO> getMethodName() {
         return clientService.getAllClients();
     }
     
     @PostMapping
-    public ClientResponseDTO addClient(@RequestBody ClientRequestDTO clientRequestDTO) {
-        return clientService.addClient(clientRequestDTO);
+    public ResponseEntity<ClientResponseDTO> addClient(@RequestBody ClientRequestDTO clientRequestDTO) {
+        ClientResponseDTO savedClient = clientService.addClient(clientRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
     }
     
     @PutMapping("/{clientId}")
@@ -53,7 +53,8 @@ public class ClientController {
     }
     
     @DeleteMapping("/{clientId}")
-    public void deleteClient(@PathVariable("clientId") Integer clientId){
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteClient(@PathVariable("clientId") Integer clientId) {
         clientService.deleteClient(clientId);
     }
     
