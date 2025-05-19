@@ -20,6 +20,8 @@ import com.unipd.synclab.project1.dto.ClientRequestDTO;
 import com.unipd.synclab.project1.dto.ClientResponseDTO;
 import com.unipd.synclab.project1.service.ClientService;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/clients") 
@@ -42,13 +44,13 @@ public class ClientController {
     }
     
     @PostMapping
-    public ResponseEntity<ClientResponseDTO> addClient(@RequestBody ClientRequestDTO clientRequestDTO) {
+    public ResponseEntity<ClientResponseDTO> addClient(@Valid @RequestBody ClientRequestDTO clientRequestDTO) {
         ClientResponseDTO savedClient = clientService.addClient(clientRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
     }
     
     @PutMapping("/{clientId}")
-    public ClientResponseDTO editClient(@RequestBody ClientRequestDTO clientRequestDTO, @PathVariable("clientId") Integer clientId) throws Exception{
+    public ClientResponseDTO editClient(@Valid @RequestBody ClientRequestDTO clientRequestDTO, @PathVariable("clientId") Integer clientId) throws Exception{
         return clientService.editClient(clientId,clientRequestDTO);
     }
     
