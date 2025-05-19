@@ -10,13 +10,13 @@ import com.unipd.synclab.project1.repository.AddressRepository;
 import com.unipd.synclab.project1.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class ClientService {
     // inserito come campo statico e aggiunto nel costruttore per implementare la constructor injection per migliore testabilità e
     // identificazione delle dipendenze
@@ -24,7 +24,7 @@ public class ClientService {
     private final AddressRepository addressRepository;
     private final ClientMapper clientMapper;
 
-    @Autowired // Opzionale se c'è un solo costruttore
+    // @Autowired  Opzionale se c'è un solo costruttore
     public ClientService(ClientRepository clientRepository,
                          AddressRepository addressRepository, 
                          ClientMapper clientMapper) {

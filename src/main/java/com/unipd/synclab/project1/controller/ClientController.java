@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,11 +23,14 @@ import com.unipd.synclab.project1.service.ClientService;
 @RestController
 @RequestMapping("/client") 
 public class ClientController {
-    @Autowired
-    ClientService clientService;
+    
+    private final ClientService clientService;
 
+    public ClientController(ClientService clientService){
+        this.clientService = clientService;
+    }
     @GetMapping("/{clientId}")
-    public ClientResponseDTO getClient(@RequestParam("clientId") Integer clientId) throws Exception {
+    public ClientResponseDTO getClient(@PathVariable("clientId") Integer clientId) throws Exception {
         ClientResponseDTO  clientDTO =  clientService.getClientbyId(clientId);
         if(clientDTO != null) 
             return clientDTO;
@@ -44,12 +48,12 @@ public class ClientController {
     }
     
     @PutMapping("/{clientId}")
-    public ClientResponseDTO editClient(@RequestBody ClientRequestDTO clientRequestDTO, @RequestParam("clientId") Integer clientId) throws Exception{
+    public ClientResponseDTO editClient(@RequestBody ClientRequestDTO clientRequestDTO, @PathVariable("clientId") Integer clientId) throws Exception{
         return clientService.editClient(clientId,clientRequestDTO);
     }
     
     @DeleteMapping("/{clientId}")
-    public void deleteClient(@RequestParam("clientId") Integer clientId){
+    public void deleteClient(@PathVariable("clientId") Integer clientId){
         clientService.deleteClient(clientId);
     }
     
