@@ -4,7 +4,7 @@ import com.unipd.synclab.project1.dto.AddressDTO;
 import com.unipd.synclab.project1.dto.ClientRequestDTO;
 import com.unipd.synclab.project1.dto.ClientResponseDTO;
 import com.unipd.synclab.project1.exception.ReferencedResourceNotFoundException;
-import com.unipd.synclab.project1.utility.ClientMapper;
+import com.unipd.synclab.project1.utility.ClientMapperMapStruct;
 import com.unipd.synclab.project1.model.Address;
 import com.unipd.synclab.project1.model.Client;
 import com.unipd.synclab.project1.repository.AddressRepository; 
@@ -22,12 +22,12 @@ public class ClientService {
     // identificazione delle dipendenze
     private final ClientRepository clientRepository; 
     private final AddressRepository addressRepository;
-    private final ClientMapper clientMapper;
+    private final ClientMapperMapStruct clientMapper;
 
     // @Autowired  Opzionale se c'è un solo costruttore
     public ClientService(ClientRepository clientRepository,
                          AddressRepository addressRepository, 
-                         ClientMapper clientMapper) {
+                         ClientMapperMapStruct clientMapper) {
         this.clientRepository = clientRepository;
         this.addressRepository = addressRepository; 
         this.clientMapper = clientMapper;
@@ -38,7 +38,7 @@ public class ClientService {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client not found with id: " + id));
         //return clientMapper.toClientResponseDTO(client);
-        return clientMapper.toClientResponseDTO(client);
+        return clientMapper.clientToClientResponseDTO(client);
     }
 
     @Transactional(readOnly = true)
@@ -46,14 +46,14 @@ public class ClientService {
         return clientRepository.findAll()
                 .stream()
                 //.map(clientMapper::toClientResponseDTO)
-                .map(clientMapper::toClientResponseDTO)
+                .map(clientMapper::clientToClientResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public ClientResponseDTO addClient(ClientRequestDTO clientRequestDTO) {
         //Client client = clientMapper.toClientEntity(clientRequestDTO);
-        Client client = clientMapper.toClientEntity(clientRequestDTO);
+        Client client = clientMapper.clientRequestDTOToClient(clientRequestDTO);
 
         // Gestione dell'Address:
         // Se l'AddressDTO ha un ID, potremmo volerlo associare a un indirizzo esistente.
@@ -75,7 +75,7 @@ public class ClientService {
         client.setAddress(addressToSave); // Riassegna per assicurare che il client abbia l'istanza corretta (modificata o nuova)
 
         Client savedClient = clientRepository.save(client);
-        return clientMapper.toClientResponseDTO(savedClient);
+        return clientMapper.clientToClientResponseDTO(savedClient);
         //return clientMapper.toClientResponseDTO(savedClient);
     }
 
@@ -100,7 +100,7 @@ public class ClientService {
                 // Aggiorna i campi dell'indirizzo trovato con quelli del DTO
                 if(addressFromRepo.getClients().size() > 1){
                     //Address newAddress = clientMapper.toAddressEntity(addressDTO);
-                    Address newAddress = clientMapper.toAddressEntity(addressDTO);
+                    Address newAddress = clientMapper.addressDTOToAddress(addressDTO);
                     newAddress.setId(null);
                     clientToUpdate.setAddress(newAddress);
                 }
@@ -112,7 +112,7 @@ public class ClientService {
             } else {
                 // L'utente vuole creare un nuovo indirizzo per questo client
                 //Address newAddress = clientMapper.toAddressEntity(addressDTO);
-                Address newAddress = clientMapper.toAddressEntity(addressDTO);
+                Address newAddress = clientMapper.addressDTOToAddress(addressDTO);
                 newAddress.setId(null); // Assicura sia nuovo
                 // addressRepository.save(newAddress); // Salva esplicitamente SE NON C'È CASCADE da Client ad Address
                                                     // o se vuoi essere sicuro che sia già persistito
@@ -125,7 +125,7 @@ public class ClientService {
 
         Client updatedClient = clientRepository.save(clientToUpdate);
         //return clientMapper.toClientResponseDTO(updatedClient);
-        return clientMapper.toClientResponseDTO(updatedClient);
+        return clientMapper.clientToClientResponseDTO(updatedClient);
     }
 
     @Transactional
