@@ -1,9 +1,7 @@
 package com.unipd.synclab.project1.model;
 
-
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+//import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -23,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // normalmente si trasforma l'entity Client in un DTO e poi si serializza quello ma questa è la soluzione più veloce
+//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // normalmente si trasforma l'entity Client in un DTO e poi si serializza quello ma questa è la soluzione più veloce
 public class Client {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -33,14 +31,8 @@ public class Client {
     
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name="address_id", nullable = false)
-    @JsonManagedReference("client-address-reference") // quando faccio get client serializza il client con il suo address
+    //@JsonManagedReference("client-address-reference") // quando faccio get client serializza il client con il suo address senza DTO
     private Address address; 
-
-    // @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    // private List<Reservation> reservations;
-
-    // @OneToOne(mappedBy = "client", cascade = CascadeType.ALL, optional = false)
-    // private Profile profile;
 
     public void setAddress(Address address) {
         // Rimuovi questo client dalla lista del vecchio indirizzo (se presente)
