@@ -15,10 +15,12 @@ public class ClientRequestDTO {
 
     @NotBlank(message = "Name cannot be blank")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @NotNull(message = "Address cannot be null")
     private String name;
 
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email should be valid")
+    @NotNull(message = "Address cannot be null")
     private String email;
 
     @NotNull(message = "Address cannot be null") // L'indirizzo è obbligatorio
